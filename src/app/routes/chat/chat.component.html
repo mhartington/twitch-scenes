@@ -1,0 +1,10 @@
+<ul>
+  <li *ngFor="let message of chatMsgs$ | async" @listAnimation>
+    <span class="display-name" [style.color]="message.color"
+      >{{ message.displayName }}:</span
+    >
+    <span class="message-wrap"
+      ><span class="message" [innerHTML]="message.formattedMsg"></span
+    ></span>
+  </li>
+</ul>
