@@ -1,6 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
 import { MsgRes, TwitchService } from '../../services/twitch.service';
 
 const listAnimation = trigger('listAnimation', [
@@ -20,12 +19,10 @@ const listAnimation = trigger('listAnimation', [
   styleUrls: ['./chat.component.css'],
   animations: [listAnimation],
 })
-export class ChatComponent implements OnInit {
-  chatMsgs$: Observable<MsgRes[]>;
-  constructor(private tmi: TwitchService) {}
+export class ChatComponent {
+  chatMsgs$ = this.tmi.select('messages');
+  constructor(private tmi: TwitchService) {
+  }
   ngOnInit() {
-    this.chatMsgs$ = this.tmi.getChat();
   }
 }
-
-
