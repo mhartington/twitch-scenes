@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { delay, map } from 'rxjs/operators';
 import { redact, list } from '@princedev/redact';
 import { ChatUserstate, Client } from 'tmi.js';
-// import { Chat, ChatEvents } from "twitch-js";
 import { randomColor } from '../util/randomcolor';
 
 import { RxState } from '@rx-angular/state';
@@ -24,17 +23,16 @@ export class TwitchService extends RxState<ChatState> {
 
   private removeOldChatAction$ = this.$.pipe(
     delay(30000),
-    map(state =>{
+    map((state) => {
       const messages = state.messages.slice(1);
-      return {...state, messages}
+      return { ...state, messages };
     })
-  )
+  );
   constructor() {
     super();
     this.set({
       messages: [],
     });
-
     this.chat = new Client({
       connection: { reconnect: true },
       channels: [environment.channel],
@@ -43,19 +41,36 @@ export class TwitchService extends RxState<ChatState> {
         password: environment.token,
       },
     });
-
-    // this.connect(this.removeOldChatAction$)
     this.chat.connect();
     this.chat.on('message', this.onMessage.bind(this));
+    this.chat.on('ban', this.onUserBan.bind(this));
+    this.chat.on('messagedeleted', this.onMessageDel.bind(this))
+  }
+
+  onUserBan(_:any, username: string){
+    this.set((state)=>({
+        ...state,
+        messages: state.messages.filter(message => message.displayName === username)
+    }))
+  }
+  onMessageDel(_channel:string, _username: string, _message: string, tags: ChatUserstate){
+    console.log(tags)
+    this.set((state)=>{
+      console.log(state)
+        return {
+          ...state,
+          messages: state.messages.filter(message => message.id !== tags['target-msg-id'])
+        }
+    })
   }
 
   onMessage(
     channel: string,
     tags: ChatUserstate,
     message: string,
-    self: boolean
+    _self: boolean
   ) {
-    if (self) return;
+    // if (self) return;
     if (message.startsWith('!')) {
       this.processCommand(message, tags, channel);
     } else {
@@ -91,19 +106,23 @@ export class TwitchService extends RxState<ChatState> {
       id,
     };
 
-    this.set((state) => ({
+    this.set((state) => {
+      console.log('state', state)
+      return {
       ...state,
       messages: [...state.messages, newMsg],
-    }));
+      }
+    });
   }
   processCommand(message: string, _tags: ChatUserstate, channel: string) {
-    const command = message.substring(1)
+    const command = message.substring(1);
     switch (command) {
       case 'uses':
         this.chat.say(channel, `Y'll ever hear of neovim?`);
     }
   }
 }
+
 
 const profane = [...list.english.profanity, ...list.english.sexual];
 function parseEmotes(emotes: any, message: string) {
