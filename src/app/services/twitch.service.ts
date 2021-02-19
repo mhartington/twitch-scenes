@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { delay, map } from 'rxjs/operators';
 import { redact, list } from '@princedev/redact';
 import { ChatUserstate, Client } from 'tmi.js';
-import { randomColor } from '../util/randomcolor';
+import { generateUUID, randomColor } from '../util';
 
 import { RxState } from '@rx-angular/state';
 import { environment } from 'src/environments/environment';
@@ -54,7 +54,6 @@ export class TwitchService extends RxState<ChatState> {
     }))
   }
   onMessageDel(_channel:string, _username: string, _message: string, tags: ChatUserstate){
-    console.log(tags)
     this.set((state)=>{
       console.log(state)
         return {
@@ -70,6 +69,7 @@ export class TwitchService extends RxState<ChatState> {
     message: string,
     _self: boolean
   ) {
+    console.log(tags)
     // if (self) return;
     if (message.startsWith('!')) {
       this.processCommand(message, tags, channel);
@@ -81,7 +81,7 @@ export class TwitchService extends RxState<ChatState> {
   processChatMsg(message: string, tags: ChatUserstate) {
     let emotes = null;
     const emoteObj = tags['emotes'];
-    const id = tags['id'];
+    const id = tags['id'] ?? generateUUID();
     let formattedMsg: string = '';
     let censoredMem = redact(message, profane);
 
