@@ -44,23 +44,31 @@ export class TwitchService extends RxState<ChatState> {
     this.chat.connect();
     this.chat.on('message', this.onMessage.bind(this));
     this.chat.on('ban', this.onUserBan.bind(this));
-    this.chat.on('messagedeleted', this.onMessageDel.bind(this))
+    this.chat.on('messagedeleted', this.onMessageDel.bind(this));
   }
 
-  onUserBan(_:any, username: string){
-    this.set((state)=>({
-        ...state,
-        messages: state.messages.filter(message => message.displayName === username)
-    }))
+  onUserBan(_: any, username: string) {
+    this.set((state) => ({
+      ...state,
+      messages: state.messages.filter(
+        (message) => message.displayName === username
+      ),
+    }));
   }
-  onMessageDel(_channel:string, _username: string, _message: string, tags: ChatUserstate){
-    this.set((state)=>{
-      console.log(state)
-        return {
-          ...state,
-          messages: state.messages.filter(message => message.id !== tags['target-msg-id'])
-        }
-    })
+  onMessageDel(
+    _channel: string,
+    _username: string,
+    _message: string,
+    tags: ChatUserstate
+  ) {
+    this.set((state) => {
+      return {
+        ...state,
+        messages: state.messages.filter(
+          (message) => message.id !== tags['target-msg-id']
+        ),
+      };
+    });
   }
 
   onMessage(
@@ -69,8 +77,7 @@ export class TwitchService extends RxState<ChatState> {
     message: string,
     _self: boolean
   ) {
-    console.log(tags)
-    // if (self) return;
+    if (_self) return;
     if (message.startsWith('!')) {
       this.processCommand(message, tags, channel);
     } else {
@@ -107,22 +114,31 @@ export class TwitchService extends RxState<ChatState> {
     };
 
     this.set((state) => {
-      console.log('state', state)
       return {
-      ...state,
-      messages: [...state.messages, newMsg],
-      }
+        ...state,
+        messages: [...state.messages, newMsg],
+      };
     });
+    // setTimeout(() => {
+    //   this.set((state) => {
+    //     return {
+    //       ...state,
+    //       messages: state.messages.filter(
+    //         (message) => message.id !== newMsg.id
+    //       ),
+    //     };
+    //   });
+    // }, 30000);
   }
   processCommand(message: string, _tags: ChatUserstate, channel: string) {
     const command = message.substring(1);
-    switch (command) {
-      case 'uses':
-        this.chat.say(channel, `Y'll ever hear of neovim?`);
-    }
+    this.chat.say(channel, `No "${command}" command, yet...`);
+    // switch (command) {
+    //   case 'uses':
+    //     this.chat.say(channel, `Y'll ever hear of neovim?`);
+    // }
   }
 }
-
 
 const profane = [...list.english.profanity, ...list.english.sexual];
 function parseEmotes(emotes: any, message: string) {

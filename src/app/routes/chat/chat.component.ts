@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
-import { MsgRes, TwitchService } from '../../services/twitch.service';
+import { TwitchService } from '../../services/twitch.service';
 
 const listAnimation = trigger('listAnimation', [
   transition(':enter', [
@@ -21,8 +21,6 @@ const listAnimation = trigger('listAnimation', [
 })
 export class ChatComponent {
   chatMsgs$ = this.tmi.select('messages');
-  constructor(private tmi: TwitchService) {
-  }
-  ngOnInit() {
-  }
+  constructor(private tmi: TwitchService) {}
+  ngOnInit() {}
 }
