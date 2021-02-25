@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { delay, map } from 'rxjs/operators';
 import { redact, list } from '@princedev/redact';
 import { ChatUserstate, Client } from 'tmi.js';
 import { generateUUID, randomColor } from '../util';
@@ -21,13 +20,6 @@ export interface ChatState {
 export class TwitchService extends RxState<ChatState> {
   public chat: Client;
 
-  private removeOldChatAction$ = this.$.pipe(
-    delay(30000),
-    map((state) => {
-      const messages = state.messages.slice(1);
-      return { ...state, messages };
-    })
-  );
   constructor() {
     super();
     this.set({
