@@ -5,6 +5,8 @@ import { generateUUID, randomColor } from '../util';
 
 import { RxState } from '@rx-angular/state';
 import { environment } from 'src/environments/environment';
+import { from, Observable, of, Subject } from 'rxjs';
+import { concatMap, delay, tap } from 'rxjs/operators';
 export interface MsgRes {
   formattedMsg: string;
   displayName: string;
@@ -19,6 +21,18 @@ export interface ChatState {
 })
 export class TwitchService extends RxState<ChatState> {
   public chat: Client;
+  private commandQueue = new Subject();
+  public commandEmitter = new Subject();
+
+  private commandQueue$ = this.commandQueue.asObservable().pipe(
+    concatMap((command: { type: 'video' | 'img'; src: string }) =>
+      of(command).pipe(
+        tap((command) => this.commandEmitter.next(command)),
+        delay(3000),
+        tap(() => this.commandEmitter.next({type: null, src: null}))
+      )
+    )
+  );
 
   constructor() {
     super();
@@ -37,6 +51,8 @@ export class TwitchService extends RxState<ChatState> {
     this.chat.on('message', this.onMessage.bind(this));
     this.chat.on('ban', this.onUserBan.bind(this));
     this.chat.on('messagedeleted', this.onMessageDel.bind(this));
+
+    this.hold(this.commandQueue$);
   }
 
   onUserBan(_: any, username: string) {
@@ -122,13 +138,25 @@ export class TwitchService extends RxState<ChatState> {
     //   });
     // }, 30000);
   }
+
   processCommand(message: string, _tags: ChatUserstate, channel: string) {
     const command = message.substring(1);
-    this.chat.say(channel, `No "${command}" command, yet...`);
-    // switch (command) {
-    //   case 'uses':
-    //     this.chat.say(channel, `Y'll ever hear of neovim?`);
-    // }
+    switch (command) {
+      case 'boilerplate':
+        this.commandQueue.next({
+          type: 'video',
+          src: '/assets/command-overlays/boilerplate.mp4',
+        });
+        break;
+      case 'chill':
+        this.commandQueue.next({
+          type: 'video',
+          src: '/assets/command-overlays/you-must-chill.mp4',
+        });
+        break;
+      default:
+        this.chat.say(channel, `No "${command}" command, yet...`);
+    }
   }
 }
 

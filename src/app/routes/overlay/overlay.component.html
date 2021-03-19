@@ -1,0 +1,12 @@
+<ng-container *rxLet="overlayState$ as command">
+  <div @fadeIn>
+    <video
+      *ngIf="command.type === 'video'"
+      [src]="command.src"
+      loop
+      playsinline
+      autoplay
+    ></video>
+    <img *ngIf="command.type === 'img'" [src]="command.src" />
+  </div>
+</ng-container>
