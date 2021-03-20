@@ -14,7 +14,7 @@ const fadeIn = trigger('fadeIn', [
   selector: 'app-overlay',
   templateUrl: './overlay.component.html',
   styleUrls: ['./overlay.component.css'],
-  animations: [fadeIn]
+  animations: [fadeIn],
 })
 export class OverlayComponent implements OnInit {
   overlayState$ = this.tmi.commandEmitter;

@@ -5,7 +5,7 @@ import { generateUUID, randomColor } from '../util';
 
 import { RxState } from '@rx-angular/state';
 import { environment } from 'src/environments/environment';
-import { from, Observable, of, Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { concatMap, delay, tap } from 'rxjs/operators';
 export interface MsgRes {
   formattedMsg: string;
@@ -29,7 +29,7 @@ export class TwitchService extends RxState<ChatState> {
       of(command).pipe(
         tap((command) => this.commandEmitter.next(command)),
         delay(3000),
-        tap(() => this.commandEmitter.next({type: null, src: null}))
+        tap(() => this.commandEmitter.next(null))
       )
     )
   );
