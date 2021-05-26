@@ -41,6 +41,7 @@ p {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  align-self: baseline;
 }
 .message-wrap {
   display: inline-block;
