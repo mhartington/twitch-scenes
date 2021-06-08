@@ -154,6 +154,12 @@ export class TwitchService extends RxState<ChatState> {
           src: '/assets/command-overlays/you-must-chill.mp4',
         });
         break;
+      case 'dotfiles':
+        this.chat.say(channel, 'https://github.com/mhartington/dotfiles');
+        break;
+      case 'telescope':
+        this.chat.say(channel, 'https://github.com/nvim-telescope/telescope.nvim');
+        break;
       default:
         this.chat.say(channel, `No "${command}" command, yet...`);
     }
